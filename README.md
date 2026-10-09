@@ -65,6 +65,7 @@ API Key 也可用环境变量，不写进文件：`set VISION_API_KEY=sk-xxxx`�
 | `--force-ocr` | 忽略文本层，强制全部走视觉模型 |
 | `--figures` | 导出页内非整页插图到 `images/` |
 | `--no-thinking` | Qwen-VL 思考模型关思考，提速 |
+| `--ask-key` | 终端交互输入 API Key（仅内存、不落盘） |
 | `--reset-cache` | 清空逐页缓存重跑 |
 
 ## 输出
@@ -79,7 +80,7 @@ API Key 也可用环境变量，不写进文件：`set VISION_API_KEY=sk-xxxx`�
 
 ## 安全
 
-`config.json` 含明文 API Key，**已在 `.gitignore` 中排除，切勿提交**。只提交 `config.example.json`。
+API Key 支持**不落盘**：`config.json` 里 `api_key` 留空，运行时加 `--ask-key` 交互输入（只进内存、不回显、进程结束即消失），或设环境变量 `VISION_API_KEY`。若仍写进 `config.json`，注意它含明文 Key，**已在 `.gitignore` 排除，切勿提交**；只提交 `config.example.json`。
 
 ## License
 

@@ -259,6 +259,35 @@ def _deep_update(base: dict, extra: dict) -> None:
             base[k] = v
 
 
+def resolve_api_key(cfg: dict, args) -> None:
+    """Resolve the vision API key WITHOUT ever writing it to disk.
+
+    Order: ``--api-key`` -> ``config.json`` -> env ``VISION_API_KEY`` (folded in
+    by load_config) -> interactive prompt, and the prompt runs ONLY when
+    ``--ask-key`` is passed. That keeps an automated (agent) run from blocking on
+    a prompt it can't answer; the agent adds ``--ask-key`` when it wants the
+    human to type. The key stays in process memory, never persisted.
+    """
+    if cfg["provider"]["api_key"]:
+        return
+    if not getattr(args, "ask_key", False):
+        return  # validate() will print an actionable error
+    base = cfg["provider"].get("base_url", "")
+    model = cfg["provider"].get("model", "")
+    try:
+        import getpass
+        log("[KEY] 请输入 API Key —— 仅本次运行使用，写入内存、不落盘（输入不回显）")
+        if base or model:
+            log("      供应商：%s · 模型：%s" % (base or "-", model or "-"))
+        key = getpass.getpass("API Key: ").strip()
+    except Exception as e:  # noqa: BLE001
+        log("[WARN] 无法交互读取 Key（%s）→ 可改用环境变量 VISION_API_KEY 或填 config.json" % e)
+        return
+    if key:
+        cfg["provider"]["api_key"] = key
+        log("[KEY] 已载入内存（%d 字符），本次运行有效，进程结束后即消失。" % len(key))
+
+
 def validate(cfg: dict) -> None:
     problems = []
     if not cfg["pdf"] or not os.path.isfile(cfg["pdf"]):
@@ -266,7 +295,7 @@ def validate(cfg: dict) -> None:
     if not cfg["provider"]["base_url"]:
         problems.append("provider.base_url 为空")
     if not cfg["provider"]["api_key"]:
-        problems.append("provider.api_key 为空（可在 config.json 填，或设环境变量 VISION_API_KEY）")
+        problems.append("provider.api_key 为空（用 --ask-key 交互输入、设环境变量 VISION_API_KEY，或填 config.json）")
     if not cfg["provider"]["model"]:
         problems.append("provider.model 为空（如 qwen-vl-max / glm-4v / gpt-4o）")
     if problems:
@@ -1038,6 +1067,7 @@ def main() -> None:
     ap.add_argument("--out", help="output directory")
     ap.add_argument("--base-url", dest="base_url", help="OpenAI-compatible base URL")
     ap.add_argument("--api-key", dest="api_key", help="API key (or env VISION_API_KEY)")
+    ap.add_argument("--ask-key", dest="ask_key", action="store_true", help="prompt for the API key on the terminal (memory only, never written to disk)")
     ap.add_argument("--model", help="vision model name")
     ap.add_argument("--dpi", type=int, help="render DPI (default 170)")
     ap.add_argument("--concurrency", type=int, help="parallel requests (default 6)")
@@ -1058,6 +1088,7 @@ def main() -> None:
         args.pages = (int(a), int(b))
 
     cfg = load_config(args)
+    resolve_api_key(cfg, args)
     validate(cfg)
 
     os.makedirs(cfg["out_dir"], exist_ok=True)

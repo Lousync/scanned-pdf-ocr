@@ -91,7 +91,10 @@ python inspect_app_providers.py
 | OpenAI | `https://api.openai.com/v1` | `gpt-4o` |
 | 其他兼容网关 | 按供应商文档 | 名字含 `vl` / `vision` / `4o` / `omni` 的多半可以 |
 
-> Key 也可以**不写进文件**，改用环境变量：`set VISION_API_KEY=sk-xxxx`，`config.json` 里 `api_key` 留空即可。
+> **推荐：不落盘。** `config.json` 里 `api_key` 留空，运行时三选一：
+> - **交互输入（最省心）**：`python ocr_pdf.py --config config.json --ask-key` → 终端提示输入，Key 只进内存、不回显、进程结束即消失。**AI 开终端让你敲 Key 就是这个流程**（agent 跑任务时带上 `--ask-key` 即可，脚本不会在无人应答时自动阻塞）。
+> - **环境变量**：`set VISION_API_KEY=sk-xxxx`（或 `setx` 永久），`config.json` 的 `api_key` 留空。
+> - **写进 `config.json`**：能用，但明文且**切勿提交**（已被 `.gitignore` 排除）。
 
 ### 3.5 模型选型建议（国内，2026）
 
