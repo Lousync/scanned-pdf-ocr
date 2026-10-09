@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scanned-pdf-ocr"
+version = "1.0.0"
+description = "Scanned PDF -> Markdown via a vision LLM (OpenAI-compatible)."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Lousync" }]
+keywords = ["ocr", "pdf", "markdown", "vision", "llm", "pymupdf"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = [
+    # PyMuPDF < 1.25 keeps Python 3.8 support (1.25+ requires 3.9+).
+    "PyMuPDF>=1.23.0,<1.25.0; python_version < '3.9'",
+    "PyMuPDF>=1.23.0; python_version >= '3.9'",
+    "requests>=2.28.0",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6"]
+
+[project.scripts]
+scanned-pdf-ocr = "ocr_pdf:main"
+ocr-providers = "inspect_app_providers:main"
+
+[tool.setuptools]
+py-modules = ["ocr_pdf", "inspect_app_providers"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"

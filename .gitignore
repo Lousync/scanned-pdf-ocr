@@ -1,0 +1,22 @@
+# --- secrets / local config (NEVER commit) ---
+config.json
+
+# --- python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# --- skill run artifacts ---
+# default out_dir is "<pdf-name>-md/" next to the pdf; keep any *-md/ out of git
+*-md/
+.cache/
+
+# --- editors / os ---
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

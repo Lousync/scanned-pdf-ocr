@@ -1,0 +1,4 @@
+# Python 3.8+ (tested on 3.8.10)
+# PyMuPDF < 1.25 keeps Python 3.8 support (1.25+ requires 3.9+).
+PyMuPDF>=1.23.0,<1.25.0
+requests>=2.28.0
